@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="profile-header">
+            {% if profile.profile_picture %}
+            <img src="{{ profile.profile_picture.url }}" class="profile-avatar mb-3">
+            {% else %}
+            <div class="profile-avatar bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3">
+                {{ profile.user.username|first|upper }}
+            </div>
+            {% endif %}
+            <h2>{{ profile.user.username }}</h2>
+            <p class="text-muted">{{ profile.bio|default:"No bio yet" }}</p>
+            <a href="{% url 'profile_update' %}" class="btn btn-primary mt-2">
+                <i class="fas fa-edit me-2"></i>Edit Profile
+            </a>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="profile-details">
+            <h3><i class="fas fa-user-circle me-2"></i>About Me</h3>
+            <p><strong><i class="fas fa-user me-2"></i>Full Name:</strong> {{ profile.full_name|default:"Not specified" }}</p>
+            <p><strong><i class="fas fa-envelope me-2"></i>Email:</strong> {{ profile.user.email }}</p>
+            <p><strong><i class="fas fa-calendar-alt me-2"></i>Joined:</strong> {{ profile.user.date_joined|date:"F Y" }}</p>
+            {% if profile.website %}
+            <p><strong><i class="fas fa-globe me-2"></i>Website:</strong> <a href="{{ profile.website }}" target="_blank">{{ profile.website }}</a></p>
+            {% endif %}
+            {% if profile.phone_number %}
+            <p><strong><i class="fas fa-phone me-2"></i>Phone:</strong> {{ profile.phone_number }}</p>
+            {% endif %}
+            {% if profile.date_of_birth %}
+            <p><strong><i class="fas fa-birthday-cake me-2"></i>Birthday:</strong> {{ profile.date_of_birth|date:"F d, Y" }}</p>
+            {% endif %}
+            {% if profile.gender %}
+            <p><strong><i class="fas fa-venus-mars me-2"></i>Gender:</strong> {{ profile.gender }}</p>
+            {% endif %}
+            {% if profile.address %}
+            <p><strong><i class="fas fa-map-marker-alt me-2"></i>Address:</strong> {{ profile.address }}</p>
+            {% endif %}
+        </div>
+        
+        <div class="profile-details mt-4">
+            <h3><i class="fas fa-pencil-alt me-2"></i>My Posts</h3>
+            {% for post in posts %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h5>
+                    <p class="text-muted small">{{ post.published_date|date:"F d, Y" }}</p>
+                    <p>{{ post.text|truncatewords:30 }}</p>
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'post_detail' post.pk %}" class="btn btn-sm btn-outline-primary">Read More</a>
+                        {% if user == post.author %}
+                        <div>
+                            <a href="{% url 'post_edit' post.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                            <a href="{% url 'post_delete' post.pk %}" class="btn btn-sm btn-outline-danger" 
+                               onclick="return confirm('Are you sure you want to delete this post?');">
+                                Delete
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="alert alert-info">
+                No posts yet. <a href="{% url 'post_new' %}" class="alert-link">Create your first post</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
