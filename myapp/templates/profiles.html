@@ -83,25 +83,5 @@
     </div>
 </div>
 
-<script>
-document.getElementById('id_profile_picture').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const preview = document.getElementById('profile-preview');
-            if (preview.tagName === 'IMG') {
-                preview.src = e.target.result;
-            } else {
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                img.className = 'profile-avatar mb-3';
-                img.id = 'profile-preview';
-                preview.parentNode.replaceChild(img, preview);
-            }
-        }
-        reader.readAsDataURL(file);
-    }
-});
-</script>
+
 {% endblock %}

@@ -11,11 +11,17 @@
         <form method="POST">
             {% csrf_token %}
             {% for field in form %}
-                <div class="mb-3">
+                <div class="mb-3 position-relative">
                     {{ field.label_tag }}
                     {{ field }}
                     {% if field.errors %}
                         <div class="text-danger">{{ field.errors.0 }}</div>
+                    {% endif %}
+
+                    {% if field.name == "password1" or field.name == "password2" %}
+                        <span class="position-absolute top-50 end-0 translate-middle-y me-3" onclick="togglePassword('{{ field.id_for_label }}', this)" style="cursor: pointer;">
+                            <i class="fa fa-eye-slash"></i>
+                        </span>
                     {% endif %}
                 </div>
             {% endfor %}
@@ -27,4 +33,6 @@
         </p>
     </div>
 </div>
+
+
 {% endblock %}
