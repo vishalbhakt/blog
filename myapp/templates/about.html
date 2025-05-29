@@ -57,7 +57,7 @@
                                 <div class="card team-card h-100 border-0 shadow hover-float">
                                     <img src="{% static 'images/team3.jpg' %}" class="card-img-top" alt="Team Member">
                                     <div class="card-body">
-                                        <h5 class="card-title">Vishal-kumar-bhakt</h5>
+                                        <h5 class="card-title">Vishal Kumar Bhakt</h5>
                                         <p class="text-muted">Founder & Lead Developer</p>
                                         <p class="card-text">Building platforms that connect people through stories.</p>
                                     </div>
@@ -75,7 +75,7 @@
                                 <div class="card team-card h-100 border-0 shadow hover-float">
                                     <img src="{% static 'images/team3.jpg' %}" class="card-img-top" alt="Team Member">
                                     <div class="card-body">
-                                        <h5 class="card-title">Vishal Kumar Bhakt</h5>
+                                        <h5 class="card-title">SVishal Kumar Bhakt</h5>
                                         <p class="text-muted">Content Editor</p>
                                         <p class="card-text">Ensuring every story gets the attention it deserves.</p>
                                     </div>
@@ -186,7 +186,94 @@
     </div>
 </div>
 
+<script>
+// Show mission statement modal
+function showMissionStatement() {
+    const modal = new bootstrap.Modal(document.getElementById('missionModal'));
+    modal.show();
+}
 
+// Array of inspirational quotes
+const quotes = [
+    "The world is changed by your example, not by your opinion. - Paulo Coelho",
+    "Storytelling is the most powerful way to put ideas into the world. - Robert McKee",
+    "There is no greater agony than bearing an untold story inside you. - Maya Angelou",
+    "Your voice matters. Your story matters. - Unknown",
+    "We are all storytellers. We all live in a network of stories. - Terry Pratchett"
+];
 
+// Show random quote
+function showRandomQuote() {
+    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+    alert(randomQuote);
+}
 
+// Add animation to team cards on scroll
+document.addEventListener('DOMContentLoaded', function() {
+    const teamCards = document.querySelectorAll('.team-card');
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.1 });
+
+    teamCards.forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'all 0.6s ease';
+        observer.observe(card);
+    });
+});
+</script>
+
+<style>
+/* Custom styles for about page */
+.year-highlight {
+    background: linear-gradient(to right, #4361ee, #3a0ca3);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: bold;
+}
+
+.text-gradient {
+    background: linear-gradient(to right, #4361ee, #f72585);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.hover-float {
+    transition: transform 0.3s ease;
+}
+
+.hover-float:hover {
+    transform: translateY(-5px);
+}
+
+.pulse-on-hover:hover {
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.team-card {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s ease;
+}
+
+.team-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+</style>
 {% endblock %}
