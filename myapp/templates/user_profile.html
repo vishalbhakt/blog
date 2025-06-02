@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+
 {% block content %}
 <div class="container py-4">
     <div class="row g-4">
@@ -6,29 +7,29 @@
         <div class="col-lg-4">
             <div class="profile-card glass-card p-4 text-center fade-in">
                 {% if profile.profile_picture and profile.profile_picture.url %}
-                <img src="{{ profile.profile_picture.url }}" class="profile-avatar mb-3">
+                    <img src="{{ profile.profile_picture.url }}" class="profile-avatar mb-3" alt="Profile Picture">
                 {% else %}
-                <div class="profile-avatar bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3">
-                    <i class="fas fa-user fa-3x"></i>
-                </div>
+                    <div class="profile-avatar bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3">
+                        <i class="fas fa-user fa-3x"></i>
+                    </div>
                 {% endif %}
-                
+
                 <h3 class="mb-2">{{ profile.user.username }}</h3>
                 <p class="text-muted mb-4">{{ profile.bio|default:"No bio yet" }}</p>
-                
+
                 {% if request.user == profile.user %}
-                <a href="{% url 'profile_update' %}" class="btn btn-primary w-100">
-                    <i class="fas fa-edit me-2"></i>Edit Profile
-                </a>
+                    <a href="{% url 'profile_update' %}" class="btn btn-primary w-100">
+                        <i class="fas fa-edit me-2"></i>Edit Profile
+                    </a>
                 {% endif %}
             </div>
         </div>
-        
+
         <!-- Profile Details -->
         <div class="col-lg-8">
             <div class="profile-card glass-card p-4 fade-in" style="animation-delay: 0.2s;">
                 <h3 class="mb-4"><i class="fas fa-user-circle me-2"></i> About Me</h3>
-                
+
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="profile-detail">
@@ -37,43 +38,64 @@
                             <p><i class="fas fa-calendar"></i> <strong>Joined:</strong> {{ profile.user.date_joined|date:"F d, Y" }}</p>
                         </div>
                     </div>
-                    
+
                     <div class="col-md-6">
                         <div class="profile-detail">
                             {% if profile.phone_number %}
-                            <p><i class="fas fa-phone"></i> <strong>Phone:</strong> {{ profile.phone_number }}</p>
+                                <p><i class="fas fa-phone"></i> <strong>Phone:</strong> {{ profile.phone_number }}</p>
                             {% endif %}
-                            
                             {% if profile.date_of_birth %}
-                            <p><i class="fas fa-birthday-cake"></i> <strong>Birthday:</strong> {{ profile.date_of_birth|date:"F d, Y" }}</p>
+                                <p><i class="fas fa-birthday-cake fa-calendar"></i> <strong>Birthday:</strong> {{ profile.date_of_birth|date:"F d, Y" }}</p>
                             {% endif %}
-                            
                             {% if profile.gender %}
-                            <p><i class="fas fa-venus-mars"></i> <strong>Gender:</strong> {{ profile.gender }}</p>
+                                <p><i class="fas fa-venus-mars"></i> <strong>Gender:</strong> {{ profile.gender }}</p>
                             {% endif %}
                         </div>
                     </div>
-                    
-                    {% if profile.address %}
-                    <div class="col-12">
-                        <div class="profile-detail">
-                            <p><i class="fas fa-map-marker-alt"></i> <strong>Address:</strong></p>
-                            <p class="ms-4">{{ profile.address|linebreaksbr }}</p>
+
+                    {% if profile.bio %}
+                        <div class="col-12">
+                            <div class="profile-detail">
+                                <p><i class="fas fa-map-marker-alt"></i> <strong>Bio :</strong></p>
+                                <p class="ms-4">{{ profile.bio|linebreaksbr }}</p>
+                            </div>
                         </div>
-                    </div>
                     {% endif %}
-                    
-                    {% if profile.website %}
-                    <div class="col-12">
-                        <div class="profile-detail">
-                            <p><i class="fas fa-globe"></i> <strong>Website:</strong> 
-                                <a href="{{ profile.website }}" target="_blank" class="text-primary">{{ profile.website }}</a>
-                            </p>
+
+                    {% if profile.address %}
+                        <div class="col-12">
+                            <div class="profile-detail">
+                                <p><i class="fas fa-map-marker-alt"></i> <strong>Address:</strong></p>
+                                <p class="ms-4">{{ profile.address|linebreaksbr }}</p>
+                            </div>
                         </div>
-                    </div>
+                    {% endif %}
+
+                    {% if profile.website %}
+                        <div class="col-12">
+                            <div class="profile-detail">
+                                <p><i class="fas fa-globe"></i> <strong>Website:</strong>
+                                    <a href="{{ profile.website }}" target="_blank" rel="noopener noreferrer" class="text-primary">{{ profile.website }}</a>
+                                </p>
+                            </div>
+                        </div>
                     {% endif %}
                 </div>
             </div>
+
+            <hr>
+            <h3>This Profile Posts</h3>
+            {% if request.user == profile.user %}
+                <a href="{% url 'post_new' %}" class="btn btn-primary mb-3">Create New Post</a>
+            {% endif %}
+
+            <ul>
+                {% for post in posts %}
+                    <li><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a> - {{ post.published_date|date:"F d, Y" }}</li>
+                {% empty %}
+                    <li>No posts yet.</li>
+                {% endfor %}
+            </ul>
         </div>
     </div>
 </div>

@@ -1,26 +1,27 @@
 {% extends 'base.html' %}
+
 {% block content %}
 <div class="container py-4">
     <div class="row g-4">
+
         <!-- Profile Image & Actions -->
         <div class="col-lg-4">
             <div class="profile-card glass-card p-4 text-center fade-in">
-                {% if form.profile_picture.value %}
+                {% if form.profile_picture.value and form.profile_picture.value.url %}
                     <img src="{{ form.profile_picture.value.url }}" class="profile-avatar mb-3" id="profile-preview">
                 {% else %}
-                    <div class="profile-avatar bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3">
+                    <div class="profile-avatar bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3" id="profile-preview">
                         <i class="fas fa-user fa-3x"></i>
                     </div>
                 {% endif %}
-                
+
                 <label for="id_profile_picture" class="btn btn-sm btn-outline-primary w-100">
                     <i class="fas fa-camera me-2"></i> Change Photo
                 </label>
-                {{ form.profile_picture }}
             </div>
         </div>
 
-        <!-- Editable Form -->
+        <!-- Profile Edit Form -->
         <div class="col-lg-8">
             <form method="POST" enctype="multipart/form-data" class="glass-card p-4 fade-in" style="animation-delay: 0.2s;">
                 {% csrf_token %}
@@ -33,61 +34,15 @@
                 {% endif %}
 
                 <div class="row g-3">
-                    <div class="col-md-6">
-                        <label for="{{ form.full_name.id_for_label }}" class="form-label">Full Name</label>
-                        {{ form.full_name }}
-                        {% if form.full_name.errors %}
-                            <div class="text-danger small">{{ form.full_name.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="{{ form.phone_number.id_for_label }}" class="form-label">Phone Number</label>
-                        {{ form.phone_number }}
-                        {% if form.phone_number.errors %}
-                            <div class="text-danger small">{{ form.phone_number.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="{{ form.date_of_birth.id_for_label }}" class="form-label">Date of Birth</label>
-                        {{ form.date_of_birth }}
-                        {% if form.date_of_birth.errors %}
-                            <div class="text-danger small">{{ form.date_of_birth.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="{{ form.gender.id_for_label }}" class="form-label">Gender</label>
-                        {{ form.gender }}
-                        {% if form.gender.errors %}
-                            <div class="text-danger small">{{ form.gender.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-12">
-                        <label for="{{ form.bio.id_for_label }}" class="form-label">Bio</label>
-                        {{ form.bio }}
-                        {% if form.bio.errors %}
-                            <div class="text-danger small">{{ form.bio.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-12">
-                        <label for="{{ form.address.id_for_label }}" class="form-label">Address</label>
-                        {{ form.address }}
-                        {% if form.address.errors %}
-                            <div class="text-danger small">{{ form.address.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="col-12">
-                        <label for="{{ form.website.id_for_label }}" class="form-label">Website</label>
-                        {{ form.website }}
-                        {% if form.website.errors %}
-                            <div class="text-danger small">{{ form.website.errors.0 }}</div>
-                        {% endif %}
-                    </div>
+                    {% for field in form.visible_fields %}
+                        <div class="{% if field.name == 'bio' or field.name == 'address' or field.name == 'website' %}col-12{% else %}col-md-6{% endif %}">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger small">{{ field.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
                 </div>
 
                 <div class="mt-4 d-grid">
@@ -97,30 +52,59 @@
                 </div>
             </form>
         </div>
+
+        <!-- Posts Section -->
+        <div class="profile-details mt-5">
+            <h3><i class="fas fa-pencil-alt me-2"></i>My Posts</h3>
+            {% for post in posts %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h5>
+                        <p class="text-muted small">{{ post.published_date|date:"F d, Y" }}</p>
+                        <p>{{ post.text|truncatewords:30 }}</p>
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'post_detail' post.pk %}" class="btn btn-sm btn-outline-primary">Read More</a>
+                            {% if user == post.author %}
+                                <div>
+                                    <a href="{% url 'post_edit' post.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                    <a href="{% url 'post_delete' post.pk %}" class="btn btn-sm btn-outline-danger"
+                                       onclick="return confirm('Are you sure you want to delete this post?');">Delete</a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="alert alert-info">
+                    No posts yet. <a href="{% url 'post_new' %}" class="alert-link">Create your first post</a>
+                </div>
+            {% endfor %}
+        </div>
+
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-document.getElementById('id_profile_picture').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const preview = document.getElementById('profile-preview');
-            if (preview.tagName === 'IMG') {
-                preview.src = e.target.result;
-            } else {
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                img.className = 'profile-avatar mb-3';
-                img.id = 'profile-preview';
-                preview.parentNode.replaceChild(img, preview);
-            }
+    document.getElementById('id_profile_picture').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                let preview = document.getElementById('profile-preview');
+                if (preview.tagName === 'IMG') {
+                    preview.src = event.target.result;
+                } else {
+                    const img = document.createElement('img');
+                    img.src = event.target.result;
+                    img.className = 'profile-avatar mb-3';
+                    img.id = 'profile-preview';
+                    preview.parentNode.replaceChild(img, preview);
+                }
+            };
+            reader.readAsDataURL(file);
         }
-        reader.readAsDataURL(file);
-    }
-});
+    });
 </script>
 {% endblock %}
