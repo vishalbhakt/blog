@@ -1,6 +1,7 @@
 # Djongo Blog - A Modern Blogging Platform
 
-![Djongo Blog Screenshot](static/images/screenshot.png)
+![Djongo Blog Screenshot](![image](https://github.com/user-attachments/assets/7aea3569-04b6-465c-ad2b-5174524fa4f1)
+)
 
 ## Table of Contents
 - [Features](#features)
