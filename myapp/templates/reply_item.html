@@ -1,0 +1,62 @@
+<div class="reply mb-3" id="comment-{{ reply.id }}">
+    <!-- Reply Header -->
+    <div class="d-flex align-items-center mb-2">
+        <a href="{% url 'user_profile' reply.author.username %}">
+            {% if reply.author.profileupdate.profile_picture %}
+                <img src="{{ reply.author.profileupdate.profile_picture.url }}" 
+                     class="rounded-circle me-2" width="28" height="28" 
+                     alt="{{ reply.author.username }}">
+            {% else %}
+                <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2"
+                     style="width:28px;height:28px;">
+                    {{ reply.author.username|first|upper }}
+                </div>
+            {% endif %}
+        </a>
+        <div>
+            <a href="{% url 'user_profile' reply.author.username %}" 
+               class="text-dark fw-bold d-block">
+                {{ reply.author.username }}
+            </a>
+            <small class="text-muted">
+                {{ reply.created_date|date:"M d, Y" }}
+                {% if reply.parent %}
+                    → Replying to 
+                    <a href="{% url 'user_profile' reply.parent.author.username %}" 
+                       class="text-primary">
+                        @{{ reply.parent.author.username }}
+                    </a>
+                {% endif %}
+            </small>
+        </div>
+    </div>
+    
+    <!-- Reply Text -->
+    <p class="mb-0">
+        {% for word in reply.text.split %}
+            {% if word|first == '@' %}
+                <a href="{% url 'user_profile' word|slice:'1:' %}" class="text-primary">{{ word }}</a>
+            {% else %}
+                {{ word }}
+            {% endif %}
+        {% endfor %}
+    </p>
+
+    <!-- Reply Button -->
+    <div class="mt-1">
+        <button class="btn btn-sm btn-outline-primary reply-btn" 
+                data-comment-id="{{ reply.id }}"
+                data-comment-author="{{ reply.author.username }}">
+            <i class="fas fa-reply me-1"></i> Reply
+        </button>
+    </div>
+
+    <!-- Nested Replies -->
+    {% if reply.get_replies %}
+        <div class="replies mt-3 ms-4 ps-3 border-start">
+            {% for nested_reply in reply.get_replies %}
+                {% include "reply_item.html" with reply=nested_reply %}
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>

@@ -4,174 +4,145 @@
 <div class="container my-5">
     <div class="row">
         <div class="col-lg-8">
-            <!-- Post Content -->
+            <!-- ========== POST CONTENT SECTION ========== -->
             <article class="card mb-4 border-0 shadow-sm">
                 {% if post.images.exists %}
                 <img src="{{ post.images.first.image.url }}" class="card-img-top" alt="{{ post.title }}">
                 {% endif %}
+                
                 <div class="card-body">
                     <h1 class="card-title">{{ post.title }}</h1>
+                    
+                    <!-- Author Info -->
                     <div class="d-flex align-items-center mb-4">
                         <a href="{% url 'user_profile' post.author.username %}">
                             {% if post.author.profileupdate.profile_picture %}
-                            <img src="{{ post.author.profileupdate.profile_picture.url }}" class="rounded-circle me-2"
-                                width="40" height="40" alt="{{ post.author.username }}">
+                            <img src="{{ post.author.profileupdate.profile_picture.url }}" 
+                                 class="rounded-circle me-2" width="40" height="40" 
+                                 alt="{{ post.author.username }}">
                             {% else %}
                             <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2"
-                                style="width:40px;height:40px;">
+                                 style="width:40px;height:40px;">
                                 {{ post.author.username|first|upper }}
                             </div>
                             {% endif %}
                         </a>
                         <div>
-                            <a href="{% url 'user_profile' post.author.username %}" class="text-dark fw-bold d-block">
-                                {{ post.author.username }}</a>
+                            <a href="{% url 'user_profile' post.author.username %}" 
+                               class="text-dark fw-bold d-block">
+                                {{ post.author.username }}
+                            </a>
                             <small class="text-muted">{{ post.published_date|date:"M d, Y" }}</small>
                         </div>
                     </div>
+                    
                     <hr>
+                    
+                    <!-- Post Actions (Author Only) -->
                     {% if user == post.author %}
-                    <a href="{% url 'post_edit' pk=post.pk %}" class="btn btn-warning">Edit Post</a>
-                    <a href="{% url 'post_delete' pk=post.pk %}" class="btn btn-danger"
-                        onclick="return confirm('Are you sure you want to delete this post?');">
-                        Delete Post
-                    </a>
+                    <div class="mb-3">
+                        <a href="{% url 'post_edit' pk=post.pk %}" class="btn btn-warning me-2">
+                            <i class="fas fa-edit me-1"></i> Edit Post
+                        </a>
+                        <a href="{% url 'post_delete' pk=post.pk %}" class="btn btn-danger"
+                           onclick="return confirm('Are you sure you want to delete this post?');">
+                            <i class="fas fa-trash me-1"></i> Delete Post
+                        </a>
+                    </div>
                     {% endif %}
+                    
+                    <!-- Post Content -->
                     <div class="post-content mb-5">
                         {{ post.text|linebreaks }}
                     </div>
                 </div>
             </article>
+            
             <hr>
 
-
-            <!-- Comments Section -->
+            <!-- ========== COMMENTS SECTION ========== -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body">
-                    <h3 class="h4 mb-4">Comments ({{ comments.count }})</h3>
+                    <h3 class="h4 mb-4">
+                        <i class="fas fa-comments me-2"></i>Comments ({{ comments.count }})
+                    </h3>
 
                     {% for comment in comments %}
-                    <div class="comment mb-4 pb-3 border-bottom" id="comment-{{ comment.id }}">
-                        <div class="d-flex align-items-center mb-2">
-                            <a href="{% url 'user_profile' comment.author.username %}">
-                                {% if comment.author.profileupdate.profile_picture %}
-                                <img src="{{ comment.author.profileupdate.profile_picture.url }}"
-                                    class="rounded-circle me-2" width="32" height="32"
-                                    alt="{{ comment.author.username }}">
-                                {% else %}
-                                <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2"
-                                    style="width:32px;height:32px;">
-                                    {{ comment.author.username|first|upper }}
-                                </div>
-                                {% endif %}
-                            </a>
-                            <div>
-                                <a href="{% url 'user_profile' comment.author.username %}"
-                                    class="text-dark fw-bold d-block">{{ comment.author.username }}</a>
-                                <small class="text-muted">{{ comment.created_date|date:"M d, Y" }}</small>
-                            </div>
-                        </div>
-                        <p class="mb-0">{{ comment.text }}</p>
-
-                        <!-- Reply button -->
-                        <div class="row mt-2">
-                            <div class="col-sm">
-                                <button class="btn btn-sm btn-outline-secondary reply-btn"
-                                    data-comment-id="{{ comment.id }}">
-                                    Reply
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Replies section -->
-                        <div class="replies mt-3 ms-4 ps-3 border-start">
-                            {% for reply in comment.get_replies %}
-                            <div class="reply mb-3">
-                                <div class="d-flex align-items-center mb-2">
-                                    <a href="{% url 'user_profile' reply.author.username %}">
-                                        {% if reply.author.profileupdate.profile_picture %}
-                                        <img src="{{ reply.author.profileupdate.profile_picture.url }}"
-                                            class="rounded-circle me-2" width="28" height="28"
-                                            alt="{{ reply.author.username }}">
-                                        {% else %}
-                                        <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2"
-                                            style="width:28px;height:28px;">
-                                            {{ reply.author.username|first|upper }}
-                                        </div>
-                                        {% endif %}
-                                    </a>
-                                    <div>
-                                        <a href="{% url 'user_profile' reply.author.username %}"
-                                            class="text-dark fw-bold d-block">{{ reply.author.username }}</a>
-                                        <small class="text-muted">{{ reply.created_date|date:"M d, Y" }}</small>
-                                    </div>
-                                </div>
-                                <p class="mb-0">{{ reply.text }}</p>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
+                        {% include "comment_item.html" with comment=comment %}
                     {% empty %}
-                    <p class="text-muted">No comments yet. Be the first to comment!</p>
+                    <div class="text-center py-4">
+                        <i class="far fa-comment-dots fa-2x text-muted mb-3"></i>
+                        <p class="text-muted">No comments yet. Be the first to comment!</p>
+                    </div>
                     {% endfor %}
                 </div>
             </div>
 
-            <!-- Comment Form -->
+            <!-- ========== COMMENT FORM SECTION ========== -->
             {% if user.is_authenticated %}
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <h3 class="h4 mb-4">Leave a Comment</h3>
+                    <h3 class="h4 mb-4">
+                        <i class="fas fa-pen me-2"></i>Leave a Comment
+                    </h3>
                     <form method="post" class="comment-form">
                         {% csrf_token %}
                         <input type="hidden" name="parent_id" id="parent_id" value="">
-                        {{ comment_form.text }}
-                        <button type="submit" class="btn btn-primary mt-3">Post Comment</button>
+                        <div class="form-group mb-3">
+                            {{ comment_form.text }}
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-1"></i> Post Comment
+                        </button>
                     </form>
                 </div>
             </div>
             {% else %}
             <div class="alert alert-info">
-                <a href="{% url 'login' %}?next={{ request.path }}" class="text-primary">Log in</a> to leave a comment.
+                <i class="fas fa-info-circle me-2"></i>
+                <a href="{% url 'login' %}?next={{ request.path }}" class="alert-link">Log in</a> to leave a comment.
             </div>
             {% endif %}
         </div>
     </div>
 </div>
 
-<!-- JavaScript for reply functionality -->
+<!-- ========== JAVASCRIPT SECTION ========== -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const replyButtons = document.querySelectorAll('.reply-btn');
         const parentIdInput = document.getElementById('parent_id');
+        const commentTextarea = document.querySelector('.comment-form textarea');
 
+        // Handle reply button clicks
         replyButtons.forEach(button => {
             button.addEventListener('click', function () {
                 const commentId = this.getAttribute('data-comment-id');
+                const commentAuthor = this.getAttribute('data-comment-author');
                 parentIdInput.value = commentId;
 
                 // Scroll to form
-                const commentForm = document.querySelector('.comment-form');
-                commentForm.scrollIntoView({ behavior: 'smooth' });
+                document.querySelector('.comment-form').scrollIntoView({ 
+                    behavior: 'smooth' 
+                });
 
-                // Focus on textarea
-                const textarea = commentForm.querySelector('textarea');
-                textarea.focus();
-                textarea.setAttribute('placeholder', 'Replying to ' +
-                    this.closest('.comment').querySelector('.fw-bold').textContent.trim() + '...');
+                // Focus and add mention
+                commentTextarea.focus();
+                commentTextarea.setAttribute('placeholder', `Replying to @${commentAuthor}...`);
+                
+                if (!commentTextarea.value.includes(`@${commentAuthor}`)) {
+                    commentTextarea.value = `@${commentAuthor} ` + commentTextarea.value;
+                }
             });
         });
 
-        // Reset form when clicking on a new comment (not reply)
-        const commentForm = document.querySelector('.comment-form');
-        commentForm.addEventListener('click', function (e) {
-            if (e.target.tagName === 'TEXTAREA' && parentIdInput.value) {
+        // Reset form when starting new comment
+        commentTextarea.addEventListener('click', function(e) {
+            if (parentIdInput.value && !commentTextarea.value.trim()) {
                 parentIdInput.value = '';
-                e.target.setAttribute('placeholder', 'Write your comment here...');
+                this.setAttribute('placeholder', 'Write your comment here...');
             }
         });
     });
 </script>
-
-
 {% endblock %}

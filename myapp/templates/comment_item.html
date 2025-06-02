@@ -1,0 +1,53 @@
+<div class="comment mb-4 pb-3 border-bottom" id="comment-{{ comment.id }}">
+    <!-- Comment Header -->
+    <div class="d-flex align-items-center mb-2">
+        <a href="{% url 'user_profile' comment.author.username %}">
+            {% if comment.author.profileupdate.profile_picture %}
+            <img src="{{ comment.author.profileupdate.profile_picture.url }}"
+                 class="rounded-circle me-2" width="32" height="32"
+                 alt="{{ comment.author.username }}">
+            {% else %}
+            <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2"
+                 style="width:32px;height:32px;">
+                {{ comment.author.username|first|upper }}
+            </div>
+            {% endif %}
+        </a>
+        <div>
+            <a href="{% url 'user_profile' comment.author.username %}"
+               class="text-dark fw-bold d-block">{{ comment.author.username }}</a>
+            <small class="text-muted">{{ comment.created_date|date:"M d, Y" }}</small>
+        </div>
+    </div>
+    
+    <!-- Comment Text -->
+    <p class="mb-0">
+        {% for word in comment.text.split %}
+            {% if word|first == '@' %}
+                <a href="{% url 'user_profile' word|slice:'1:' %}" class="text-primary">{{ word }}</a>
+            {% else %}
+                {{ word }}
+            {% endif %}
+        {% endfor %}
+    </p>
+
+    <!-- Reply Button -->
+    <div class="row mt-2">
+        <div class="col-sm">
+            <button class="btn btn-sm btn-outline-primary reply-btn"
+                    data-comment-id="{{ comment.id }}"
+                    data-comment-author="{{ comment.author.username }}">
+                <i class="fas fa-reply me-1"></i> Reply
+            </button>
+        </div>
+    </div>
+
+    <!-- Replies Section -->
+    {% if comment.get_replies %}
+    <div class="replies mt-3 ms-4 ps-3 border-start">
+        {% for reply in comment.get_replies %}
+            {% include "reply_item.html" with reply=reply %}
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
